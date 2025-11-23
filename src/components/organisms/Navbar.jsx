@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export default function Navbar() {
-  const [isDropdownOpen, setDropdownOpen] = useState(true);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
 
   return (
     
