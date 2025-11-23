@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import AuthLayout from "../templates/AuthLayout";
-import AuthForm from "../molecules/AuthForm";
 import TextField from "../atoms/TextField";
 import Button from "../atoms/Button";
 
@@ -9,12 +8,12 @@ export default function Register() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate("/");  // kembali ke login setelah register dummy
+    navigate("/");  
   };
 
   return (
     <AuthLayout title="Daftar" subtitle="Selamat datang!">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4"> 
         <TextField
           label="Username"
           id="username"
@@ -35,7 +34,7 @@ export default function Register() {
         <Button type="submit">Daftar</Button>
       </form>
 
-      <p className="text-xs text-center mt-4 opacity-80">
+      <p className="text-xs text-center mt-3 sm:mt-4 opacity-80">
         Sudah punya akun?{" "}
         <button
           onClick={() => navigate("/")}
