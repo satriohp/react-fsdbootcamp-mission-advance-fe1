@@ -1,8 +1,9 @@
 import Badge from "../atoms/Badge";
 
-export default function PosterItem({ src, title, year, badge, itemsPerView = 6 }) {
+export default function LandscapePosterItem({ src, title, year, badge, itemsPerView = 6 }) {
+  // Hitung width berdasarkan jumlah item per view
   const getItemWidth = () => {
-    const gap = itemsPerView > 1 ? (itemsPerView - 1) * 1 : 0; 
+    const gap = itemsPerView > 1 ? (itemsPerView - 1) * 1 : 0;
     return `calc((100% - ${gap}rem) / ${itemsPerView})`;
   };
 
@@ -16,7 +17,7 @@ export default function PosterItem({ src, title, year, badge, itemsPerView = 6 }
         src={src}
         alt={title}
         className="rounded-lg w-full h-auto object-cover group-hover:opacity-80 transition-opacity duration-200"
-        style={{ aspectRatio: '2/3' }} 
+        style={{ aspectRatio: '16/9' }} // Landscape aspect ratio
       />
       {title && (
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent rounded-b-lg p-2 sm:p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">

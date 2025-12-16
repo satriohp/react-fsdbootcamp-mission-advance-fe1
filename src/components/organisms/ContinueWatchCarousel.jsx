@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import PosterItem from "../molecules/PosterItem";
+import LandscapePosterItem from "../molecules/LandscapePosterItem";
 
-export default function CarouselSection({ title, items, leftArrowSrc, rightArrowSrc }) {
+export default function ContinueWatchCarousel({ title, items, leftArrowSrc, rightArrowSrc }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(6);
   const carouselRef = useRef(null);
@@ -30,13 +30,11 @@ export default function CarouselSection({ title, items, leftArrowSrc, rightArrow
 
   // Duplikasi items untuk infinite scroll
   const infiniteItems = [...items, ...items, ...items];
-  const totalItems = infiniteItems.length;
 
   // Scroll ke kiri
   const scrollLeft = () => {
     setCurrentIndex((prev) => {
       const newIndex = prev - 1;
-      // Reset ke bagian tengah jika sudah di awal
       if (newIndex < 0) {
         return items.length * 2 - 1;
       }
@@ -48,7 +46,6 @@ export default function CarouselSection({ title, items, leftArrowSrc, rightArrow
   const scrollRight = () => {
     setCurrentIndex((prev) => {
       const newIndex = prev + 1;
-      // Reset ke bagian tengah jika sudah di akhir
       if (newIndex >= items.length * 2) {
         return items.length;
       }
@@ -87,7 +84,7 @@ export default function CarouselSection({ title, items, leftArrowSrc, rightArrow
             }}
           >
             {infiniteItems.map((item, index) => (
-              <PosterItem
+              <LandscapePosterItem
                 key={`${item.id}-${index}`}
                 src={item.src}
                 title={item.title}
