@@ -1,15 +1,22 @@
-import { Routes, Route } from "react-router-dom";
-import Login from "./components/pages/Login";
-import Register from "./components/pages/Register";
-import Home from "./components/pages/Home";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./components/pages/Home.jsx";
+import Series from "./components/pages/Series.jsx";
+import Film from "./components/pages/Film.jsx";
 
-
-export default function App() {
+function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/home" element={<Home />} />  
-    </Routes>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} /> 
+        
+        <Route path="/home" element={<Home />} />
+        <Route path="/series" element={<Series />} />
+        <Route path="/film" element={<Film />} />
+
+        <Route path="*" element={<Home />} />
+      </Routes>
+    </Router>
   );
 }
+
+export default App;

@@ -1,6 +1,6 @@
 import Badge from "../atoms/Badge";
 
-export default function PosterItem({ src, title, year, badge, itemsPerView = 6 }) {
+export default function PosterItem({ src, title, year, badge, itemsPerView = 6, onClick }) {
   const getItemWidth = () => {
     const gap = itemsPerView > 1 ? (itemsPerView - 1) * 1 : 0; 
     return `calc((100% - ${gap}rem) / ${itemsPerView})`;
@@ -10,6 +10,7 @@ export default function PosterItem({ src, title, year, badge, itemsPerView = 6 }
     <div 
       className="relative cursor-pointer group flex-shrink-0"
       style={{ width: getItemWidth() }}
+      onClick={onClick}
     >
       {badge && <Badge>{badge}</Badge>}
       <img

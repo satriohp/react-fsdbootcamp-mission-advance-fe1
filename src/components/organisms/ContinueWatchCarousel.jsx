@@ -1,99 +1,50 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import LandscapePosterItem from "../molecules/LandscapePosterItem";
 
-export default function ContinueWatchCarousel({ title, items, leftArrowSrc, rightArrowSrc }) {
+export default function ContinueWatchCarousel({ title, items, leftArrowSrc, rightArrowSrc, onItemClick }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [itemsPerView, setItemsPerView] = useState(6);
-  const carouselRef = useRef(null);
+  const [itemsPerView, setItemsPerView] = useState(4);
 
   useEffect(() => {
     const updateItemsPerView = () => {
       const width = window.innerWidth;
-      if (width < 640) {
-        setItemsPerView(2); 
-      } else if (width < 768) {
-        setItemsPerView(3); 
-      } else if (width < 1024) {
-        setItemsPerView(4); 
-      } else if (width < 1280) {
-        setItemsPerView(5); 
-      } else {
-        setItemsPerView(6); 
-      }
+      if (width < 768) setItemsPerView(1); 
+      else if (width < 1024) setItemsPerView(2); 
+      else setItemsPerView(4);
     };
-
     updateItemsPerView();
     window.addEventListener("resize", updateItemsPerView);
     return () => window.removeEventListener("resize", updateItemsPerView);
   }, []);
 
-  const infiniteItems = [...items, ...items, ...items];
-
-  const scrollLeft = () => {
-    setCurrentIndex((prev) => {
-      const newIndex = prev - 1;
-      if (newIndex < 0) {
-        return items.length * 2 - 1;
-      }
-      return newIndex;
-    });
-  };
-
-  const scrollRight = () => {
-    setCurrentIndex((prev) => {
-      const newIndex = prev + 1;
-      if (newIndex >= items.length * 2) {
-        return items.length;
-      }
-      return newIndex;
-    });
-  };
-
-  const getTransformValue = () => {
-    const itemWidth = 100 / itemsPerView;
-    return -(currentIndex * itemWidth);
-  };
-
   return (
-    <section className="my-10 sm:my-12 px-4 sm:px-6 lg:px-8"> 
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl sm:text-2xl font-semibold text-white">{title}</h2>
-      </div>
-
-      <div className="relative">
-        <button
-          onClick={scrollLeft}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-1.5 sm:p-2 rounded-full z-10 transition-all duration-200 flex items-center justify-center"
-          aria-label="Scroll left"
-        >
-          <img src={leftArrowSrc} alt="Arrow Left" className="w-5 h-5 sm:w-6 sm:h-6" />
+    <section className="py-6 sm:py-8 px-4 sm:px-8 relative overflow-hidden">
+      <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">{title}</h3>
+      <div className="relative flex items-center">
+        <button onClick={() => setCurrentIndex(prev => Math.max(prev - 1, 0))} className="absolute left-0 z-20 bg-black/70 p-2 rounded-full -translate-x-2">
+          <img src={leftArrowSrc} className="w-6 h-6" />
         </button>
-
-        <div className="overflow-hidden" ref={carouselRef}>
+        
+        <div className="w-full overflow-hidden">
           <div 
-            className="flex gap-3 sm:gap-4 transition-transform duration-500 ease-out"
-            style={{ 
-              transform: `translateX(${getTransformValue()}%)`,
-            }}
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
           >
-            {infiniteItems.map((item, index) => (
-              <LandscapePosterItem
-                key={`${item.id}-${index}`}
-                src={item.src}
-                title={item.title}
-                year={item.year}
-                itemsPerView={itemsPerView}
-              />
+            {items.map((item) => (
+              <div 
+                key={item.id} 
+                className="px-2 flex-shrink-0 cursor-pointer" 
+                style={{ width: `${100 / itemsPerView}%` }}
+                onClick={() => onItemClick(item)}
+              >
+                <LandscapePosterItem src={item.src} title={item.title} itemsPerView={1} />
+              </div>
             ))}
           </div>
         </div>
 
-        <button
-          onClick={scrollRight}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-1.5 sm:p-2 rounded-full z-10 transition-all duration-200 flex items-center justify-center"
-          aria-label="Scroll right"
-        >
-          <img src={rightArrowSrc} alt="Arrow Right" className="w-5 h-5 sm:w-6 sm:h-6" />
+        <button onClick={() => setCurrentIndex(prev => Math.min(prev + 1, items.length - itemsPerView))} className="absolute right-0 z-20 bg-black/70 p-2 rounded-full translate-x-2">
+          <img src={rightArrowSrc} className="w-6 h-6" />
         </button>
       </div>
     </section>
