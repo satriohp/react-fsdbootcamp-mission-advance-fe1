@@ -7,7 +7,8 @@ export default function ContinueWatchCarousel({
   category, 
   onDelete, 
   leftArrowSrc, 
-  rightArrowSrc 
+  rightArrowSrc,
+  onItemClick 
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(6);
@@ -33,34 +34,47 @@ export default function ContinueWatchCarousel({
   };
 
   return (
-    <section className="my-10 px-4 sm:px-6 lg:px-8">
-      <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4">{title}</h2>
-      <div className="relative group/carousel">
+    <section className="py-6 sm:py-8 px-4 sm:px-8 relative overflow-hidden group/carousel">
+      <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">{title}</h3>
+      <div className="relative flex items-center">
         {currentIndex > 0 && (
-          <button onClick={scrollLeft} className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-black/70 p-2 rounded-full z-10 transition-transform hover:scale-110">
+          <button 
+            onClick={scrollLeft} 
+            className="absolute left-0 z-20 bg-black/70 p-2 rounded-full -translate-x-2 transition-transform hover:scale-110"
+          >
             <img src={leftArrowSrc} alt="Prev" className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         )}
-        <div className="overflow-hidden">
+        
+        <div className="w-full overflow-hidden">
           <div 
-            className="flex gap-4 transition-transform duration-500 ease-in-out"
+            className="flex transition-transform duration-500 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
           >
             {items.map((item) => (
-              <LandscapePosterItem
-                key={item.id}
-                src={item.src}
-                title={item.title}
-                year={item.year}
-                itemsPerView={itemsPerView}
-                onDelete={() => onDelete(category, item.id)}
-              />
+              <div 
+                key={item.id} 
+                className="flex-shrink-0 px-1 sm:px-2" 
+                style={{ width: `${100 / itemsPerView}%` }}
+                onClick={() => onItemClick && onItemClick(item)}
+              >
+                <LandscapePosterItem 
+                  src={item.src} 
+                  title={item.title} 
+                  year={item.year}
+                  itemsPerView={1} 
+                  onDelete={onDelete ? () => onDelete(category, item.id) : null}
+                />
+              </div>
             ))}
           </div>
         </div>
 
         {currentIndex < items.length - itemsPerView && (
-          <button onClick={scrollRight} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 bg-black/70 p-2 rounded-full z-10 transition-transform hover:scale-110">
+          <button 
+            onClick={scrollRight} 
+            className="absolute right-0 z-20 bg-black/70 p-2 rounded-full translate-x-2 transition-transform hover:scale-110"
+          >
             <img src={rightArrowSrc} alt="Next" className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         )}

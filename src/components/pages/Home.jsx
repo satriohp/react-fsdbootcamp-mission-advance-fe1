@@ -1,10 +1,12 @@
+import { useState, useEffect } from "react";
 import MainLayout from "../templates/MainLayout";
 import Hero from "../organisms/Hero";
 import ContinueWatchCarousel from "../organisms/ContinueWatchCarousel";
 import CarouselSection from "../organisms/CarouselSection";
+import MovieDetailModal from "../organisms/MovieDetailModal"; 
 import PremiumModal from "../organisms/PremiumModal"; 
+import VideoPlayer from "../organisms/VideoPlayer"; 
 import initialMovies from "../../data/movies"; 
-import { useState, useEffect } from "react";
 
 import leftArrow from "/assets/frame72.png"; 
 import rightArrow from "/assets/frame71.png";
@@ -15,8 +17,11 @@ export default function Home() {
     return savedData ? JSON.parse(savedData) : initialMovies;
   });
 
-  const [isUserPremium] = useState(false); 
+  const [selectedMovie, setSelectedMovie] = useState(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [activeVideo, setActiveVideo] = useState(null); 
+  const [pendingMovie, setPendingMovie] = useState(null); 
+  const [isUserPremium] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
   const [newMovie, setNewMovie] = useState({ title: "", category: "trending", src: "" });
 
@@ -24,12 +29,37 @@ export default function Home() {
     localStorage.setItem("chill_movie_list", JSON.stringify(movieList));
   }, [movieList]);
 
-  const handleItemClick = (item) => {
-    if (item.isPremium && !isUserPremium) {
-      setShowPremiumModal(true);
+  const handleItemClick = (movie) => {
+    setSelectedMovie(movie);
+  };
+
+  const handleStartWatch = (movie) => {
+    if (movie.isPremium && !isUserPremium) {
+      setPendingMovie(movie); 
+      setSelectedMovie(null);
+      setShowPremiumModal(true); 
+      document.body.style.overflow = "hidden";
     } else {
-      console.log("Buka film:", item.title);
+      setSelectedMovie(null);
+      setActiveVideo(movie); 
+      document.body.style.overflow = "hidden";
     }
+  };
+
+  const handleBackFromPlayer = () => {
+    setActiveVideo(null);
+    document.body.style.overflow = "auto";
+  };
+
+  const handleClosePremium = () => {
+    setShowPremiumModal(false);
+    setPendingMovie(null);
+    document.body.style.overflow = "auto";
+  };
+
+  const showToast = (message, type = "success") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast({ show: false, message: "", type: "" }), 3000); 
   };
 
   const handleDeleteMovie = (category, id) => {
@@ -49,7 +79,7 @@ export default function Home() {
         ...newMovie, 
         id, 
         src: newMovie.src || "https://placehold.co/600x400?text=No+Image",
-        isPremium: Math.random() > 0.5 
+        isPremium: Math.random() > 0.7 
     };
 
     setMovieList(prev => ({
@@ -61,13 +91,22 @@ export default function Home() {
     showToast("Film berhasil ditambahkan!");
   };
 
-  const showToast = (message, type = "success") => {
-    setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: "", type: "" }), 3000); 
-  };
-
   return (
     <MainLayout>
+      {activeVideo && (
+        <VideoPlayer 
+          movie={activeVideo} 
+          onBack={handleBackFromPlayer} 
+        />
+      )}
+
+      {showPremiumModal && (
+        <PremiumModal 
+          movie={pendingMovie} 
+          onClose={handleClosePremium} 
+        />
+      )}
+
       <Hero />
       
       {toast.show && (
@@ -75,23 +114,21 @@ export default function Home() {
           {toast.message}
         </div>
       )}
-      
-      {showPremiumModal && <PremiumModal onClose={() => setShowPremiumModal(false)} />}
 
       <section className="px-4 sm:px-6 lg:px-8 my-10">
-        <div className="bg-[#1C1C1C] p-6 rounded-xl border border-white/5 shadow-xl">
-          <h2 className="text-xl sm:text-2xl font-semibold text-white mb-6">Tambah Koleksi Film</h2>
-          <form onSubmit={handleAddMovie} className="flex flex-col md:flex-row gap-4 items-end">
-            <div className="flex-1 w-full">
+        <div className="bg-[#181A1C] p-6 rounded-xl border border-white/10 shadow-xl">
+          <h2 className="text-xl font-semibold text-white mb-6">Tambah Koleksi Film (Admin)</h2>
+          <form onSubmit={handleAddMovie} className="flex flex-col md:grid md:grid-cols-4 gap-4 items-end">
+            <div>
               <label className="text-xs text-gray-400 block mb-1">Judul Film</label>
               <input 
                 className="w-full bg-[#2C2F32] p-2.5 rounded-lg text-white outline-none focus:ring-1 focus:ring-[#0F1E93]" 
                 value={newMovie.title} 
                 onChange={(e) => setNewMovie({...newMovie, title: e.target.value})} 
-                placeholder="Masukkan judul..." 
+                placeholder="Judul..." 
               />
             </div>
-            <div className="w-full md:w-48">
+            <div>
               <label className="text-xs text-gray-400 block mb-1">Kategori</label>
               <select 
                 className="w-full bg-[#2C2F32] p-2.5 rounded-lg text-white outline-none focus:ring-1 focus:ring-[#0F1E93]" 
@@ -104,8 +141,8 @@ export default function Home() {
                 <option value="newrelease">Rilis Baru</option>
               </select>
             </div>
-            <div className="flex-1 w-full">
-              <label className="text-xs text-gray-400 block mb-1">URL Poster (Opsional)</label>
+            <div>
+              <label className="text-xs text-gray-400 block mb-1">URL Poster</label>
               <input 
                 className="w-full bg-[#2C2F32] p-2.5 rounded-lg text-white outline-none focus:ring-1 focus:ring-[#0F1E93]"
                 value={newMovie.src}
@@ -115,18 +152,63 @@ export default function Home() {
             </div>
             <button 
               type="submit" 
-              className="w-full md:w-auto bg-[#0F1E93] hover:bg-[#192DB7] text-white py-2.5 px-6 rounded-lg font-semibold transition duration-200"
+              className="bg-[#0F1E93] hover:bg-[#192DB7] text-white py-2.5 px-6 rounded-lg font-semibold transition w-full"
             >
-              + Tambah Movie
+              + Tambah
             </button>
           </form>
         </div>
       </section>
 
-      <ContinueWatchCarousel title="Melanjutkan Tonton" items={movieList.continue} category="continue" onDelete={handleDeleteMovie} onNavigate={handleItemClick} leftArrowSrc={leftArrow} rightArrowSrc={rightArrow} />
-      <CarouselSection title="Top Rating Hari Ini" items={movieList.toprated} category="toprated" onDelete={handleDeleteMovie} onNavigate={handleItemClick} leftArrowSrc={leftArrow} rightArrowSrc={rightArrow} />
-      <CarouselSection title="Film Trending" items={movieList.trending} category="trending" onDelete={handleDeleteMovie} onNavigate={handleItemClick} leftArrowSrc={leftArrow} rightArrowSrc={rightArrow} />
-      <CarouselSection title="Rilis Baru" items={movieList.newrelease} category="newrelease" onDelete={handleDeleteMovie} onNavigate={handleItemClick} leftArrowSrc={leftArrow} rightArrowSrc={rightArrow} />
+      <div className="flex flex-col gap-4 sm:gap-8 pb-10">
+        <ContinueWatchCarousel
+          title="Melanjutkan Tonton"
+          items={movieList.continue}
+          category="continue"
+          onDelete={handleDeleteMovie}
+          leftArrowSrc={leftArrow}  
+          rightArrowSrc={rightArrow} 
+          onItemClick={handleItemClick} 
+        />
+
+        <CarouselSection
+          title="Top Rating Hari Ini"
+          items={movieList.toprated}
+          category="toprated"
+          onDelete={handleDeleteMovie}
+          leftArrowSrc={leftArrow}  
+          rightArrowSrc={rightArrow} 
+          onItemClick={handleItemClick}
+        />
+
+        <CarouselSection
+          title="Film Trending"
+          items={movieList.trending}
+          category="trending"
+          onDelete={handleDeleteMovie}
+          leftArrowSrc={leftArrow}  
+          rightArrowSrc={rightArrow} 
+          onItemClick={handleItemClick}
+        />
+
+        <CarouselSection
+          title="Rilis Baru"
+          items={movieList.newrelease}
+          category="newrelease"
+          onDelete={handleDeleteMovie}
+          leftArrowSrc={leftArrow}  
+          rightArrowSrc={rightArrow} 
+          onItemClick={handleItemClick}
+        />
+      </div>
+
+      {selectedMovie && (
+        <MovieDetailModal 
+          movie={selectedMovie} 
+          onClose={() => setSelectedMovie(null)}
+          onStartWatch={handleStartWatch} 
+        />
+      )}
     </MainLayout>
   );
 }
