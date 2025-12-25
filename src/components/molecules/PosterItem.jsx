@@ -1,6 +1,6 @@
 import IconButton from "../atoms/IconButton";
 
-export default function PosterItem({ src, title, year, onDelete, itemsPerView = 6 }) {
+export default function PosterItem({ src, title, year, onDelete, onClick, itemsPerView = 6 }) {
   const getItemWidth = () => {
     const gap = itemsPerView > 1 ? (itemsPerView - 1) * 1 : 0; 
     return `calc((100% - ${gap}rem) / ${itemsPerView})`;
@@ -10,11 +10,12 @@ export default function PosterItem({ src, title, year, onDelete, itemsPerView = 
     <div 
       className="relative cursor-pointer group flex-shrink-0"
       style={{ width: getItemWidth() }}
+      onClick={onClick}
     >
       <div className="absolute top-2 right-2 z-40 opacity-0 group-hover:opacity-100 transition-opacity">
         <IconButton 
           onClick={(e) => {
-            e.stopPropagation(); 
+            e.stopPropagation();
             onDelete();
           }}
           className="bg-red-600/90 hover:bg-red-700 text-white w-7 h-7 sm:w-8 sm:h-8"
@@ -31,7 +32,7 @@ export default function PosterItem({ src, title, year, onDelete, itemsPerView = 
       />
       {title && (
         <div className="mt-2">
-          <h4 className="text-xs sm:text-sm font-semibold text-white truncate">{title}</h4>
+          <h4 className="text-white text-xs sm:text-sm font-medium truncate">{title}</h4>
         </div>
       )}
     </div>

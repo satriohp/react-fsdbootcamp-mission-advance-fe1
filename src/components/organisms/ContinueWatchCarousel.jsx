@@ -41,8 +41,6 @@ export default function ContinueWatchCarousel({
             <img src={leftArrowSrc} alt="Prev" className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         )}
-
-        {/* PERBAIKAN: ref={carouselRef} DIHAPUS agar tidak error */}
         <div className="overflow-hidden">
           <div 
             className="flex gap-4 transition-transform duration-500 ease-in-out"
