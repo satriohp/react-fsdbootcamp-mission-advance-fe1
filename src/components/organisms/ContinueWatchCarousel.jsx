@@ -7,7 +7,8 @@ export default function ContinueWatchCarousel({
   category, 
   onDelete, 
   leftArrowSrc, 
-  rightArrowSrc 
+  rightArrowSrc,
+  onItemClick 
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(6);
@@ -33,17 +34,20 @@ export default function ContinueWatchCarousel({
   };
 
   return (
-    <section className="my-10 px-4 sm:px-6 lg:px-8">
+    <section className="my-10 px-4 sm:px-6 lg:px-8 group/carousel relative">
       <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4">{title}</h2>
-      <div className="relative group/carousel">
+      
+      <div className="relative flex items-center">
         {currentIndex > 0 && (
-          <button onClick={scrollLeft} className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-black/70 p-2 rounded-full z-10 transition-transform hover:scale-110">
+          <button 
+            onClick={scrollLeft} 
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-black/70 p-2 rounded-full z-10 transition-transform hover:scale-110"
+          >
             <img src={leftArrowSrc} alt="Prev" className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         )}
 
-        {/* PERBAIKAN: ref={carouselRef} DIHAPUS agar tidak error */}
-        <div className="overflow-hidden">
+        <div className="overflow-hidden w-full">
           <div 
             className="flex gap-4 transition-transform duration-500 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
@@ -55,14 +59,18 @@ export default function ContinueWatchCarousel({
                 title={item.title}
                 year={item.year}
                 itemsPerView={itemsPerView}
-                onDelete={() => onDelete(category, item.id)}
+                onDelete={onDelete ? () => onDelete(category, item.id) : null}
+                onClick={() => onItemClick && onItemClick(item)}
               />
             ))}
           </div>
         </div>
 
         {currentIndex < items.length - itemsPerView && (
-          <button onClick={scrollRight} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 bg-black/70 p-2 rounded-full z-10 transition-transform hover:scale-110">
+          <button 
+            onClick={scrollRight} 
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 bg-black/70 p-2 rounded-full z-10 transition-transform hover:scale-110"
+          >
             <img src={rightArrowSrc} alt="Next" className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         )}

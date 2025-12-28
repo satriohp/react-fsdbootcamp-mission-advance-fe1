@@ -8,7 +8,7 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate("/home"); // dummy
+    navigate("/home"); 
   };
 
   return (
@@ -17,7 +17,10 @@ export default function Login() {
       <GoogleButton />
       <p className="text-xs text-center mt-4 opacity-80">
         Belum punya akun?{" "}
-        <button onClick={() => navigate("/register")} className="font-semibold">
+        <button 
+          onClick={() => navigate("/register")} 
+          className="font-semibold hover:underline"
+        >
           Daftar
         </button>
       </p>
